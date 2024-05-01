@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 
-from polls.models import Question, Choice
+from api.bulk_serializers import BulkSerializerMixin, BulkListSerializer
+from polls.models import Choice, Question
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,9 +23,13 @@ class ChoiceSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["url", "votes", "choice_text"]
 
 
-class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+class QuestionSerializer(BulkSerializerMixin, serializers.HyperlinkedModelSerializer):
     choices = ChoiceSerializer(source="choice_set", many=True)
 
     class Meta:
         model = Question
         fields = ["url", "question_text", "pub_date", "choices", "date_created"]
+        list_serializer_class = BulkListSerializer
+        # Since request defined in test use url we set this property to identify from where to extract model pk
+        update_lookup_field = "url"
+        lookup_field_type = int

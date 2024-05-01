@@ -3,7 +3,22 @@ from rest_framework import routers
 
 from . import views
 
-router = routers.DefaultRouter()
+
+class BulkRouter(routers.DefaultRouter):
+    """
+    Map http methods to actions defined for bulk patch method.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.routes[0].mapping.update(
+            {
+                "patch": "partial_bulk_update",
+            }
+        )
+
+
+router = BulkRouter()
 router.register(r"users", views.UserViewSet)
 router.register(r"groups", views.GroupViewSet)
 router.register(r"questions", views.QuestionViewSet)
