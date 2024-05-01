@@ -32,6 +32,11 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # Modify queryset to populate Question.choices in only 2 queries.
+    def get_queryset(self):
+        queryset = self.queryset
+        return  queryset.prefetch_related("choice_set")
+
 
 class ChoiceViewSet(viewsets.ModelViewSet):
     """
